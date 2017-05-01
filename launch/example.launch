@@ -1,0 +1,11 @@
+<launch>
+    <!-- An example which reads a CM-0120 CO2 sensor -->
+    <node pkg="simple_serial_port_reader" type="simple_serial_port_reader" name="simple_serial_port_reader" output="screen">
+        <remap from="formatted" to="co2/state"/>
+        <param name="device" value="/dev/ttyUSB0"/>
+        <param name="baud_rate" value="9600"/>
+        <param name="match_expression" value="Z (\d+) z (\d+)\r\n"/>
+        <param name="format_expression" value="CO2: Filtered = $1 ppm, Raw = $2 ppm"/>
+        <param name="debug" value="false"/>
+    </node>
+</launch>
