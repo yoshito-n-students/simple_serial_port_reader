@@ -1,3 +1,5 @@
+#include <string>
+
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/read_until.hpp>
@@ -9,7 +11,6 @@
 #include <ros/node_handle.h>
 #include <ros/param.h>
 #include <ros/publisher.h>
-#include <ros/spinner.h>
 #include <std_msgs/String.h>
 
 namespace ba = boost::asio;
