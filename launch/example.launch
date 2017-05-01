@@ -1,6 +1,6 @@
 <launch>
     <!-- An example which reads a CM-0120 CO2 sensor -->
-    <node pkg="simple_serial_port_reader" type="simple_serial_port_reader" name="simple_serial_port_reader" output="screen">
+    <node pkg="simple_serial_port_reader" type="simple_serial_port_reader" name="co2_sensor" output="screen">
         <remap from="formatted" to="co2/state"/>
         <param name="device" value="/dev/ttyUSB0"/>
         <param name="baud_rate" value="9600"/>
