@@ -1,2 +1,2 @@
-# simple_serial_reader
+# simple_serial_port_reader
 Read, search, and format texts from a serial port
