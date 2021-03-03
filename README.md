@@ -13,7 +13,7 @@ ___~baudrate___ (int, default: 9600)
 ___~start_command___ (string, default: "")
 * command to write just after opening the serial port
 * write nothing if empty
-* do not miss adding newline charactors if required
+* do not forget to add newline charactors if required
 
 ___~match_expression___ (string, default: "(.+)\r?\n")
 * regular expression to match read texts
@@ -26,10 +26,10 @@ ___~format_expression___ (string, default: "$1")
 ___~stop_command___ (string, default: "")
 * command to write just before closing the serial port
 * write nothing if empty
-* do not miss adding newline charactors if required
+* do not forget to add newline charactors if required
 
 ___~verbose___ (bool, default: false)
-* print texts wrote, read and formatted
+* print texts wrote, read and formatted if true
 
 ## <u>Example</u>
 * See [example.launch](launch/example.launch)
