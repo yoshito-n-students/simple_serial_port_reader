@@ -8,7 +8,7 @@ ___formatted___ (std_msgs/String)
 ## <u>Parameters</u>
 ___~device___ (string, default: "/dev/ttyUSB0")
 
-___~baudrate___ (int, default: 9600)
+___~baud_rate___ (int, default: 9600)
 
 ___~start_command___ (string, default: "")
 * command to write just after opening the serial port
