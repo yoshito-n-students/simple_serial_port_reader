@@ -25,16 +25,16 @@ int main(int argc, char *argv[]) {
 
   try {
     // load parameters
-    const std::string device = rp::param< std::string >("~device", "/dev/ttyUSB0");
+    const std::string device = rp::param<std::string>("~device", "/dev/ttyUSB0");
     const int baud_rate = rp::param("~baud_rate", 9600);
-    const std::string start_command = rp::param< std::string >("~start_command", "");
-    const boost::regex match_expression(rp::param< std::string >("~match_expression", "(.+)\r?\n"));
-    const std::string format_expression(rp::param< std::string >("~format_expression", "$1"));
-    const std::string stop_command = rp::param< std::string >("~stop_command", "");
+    const std::string start_command = rp::param<std::string>("~start_command", "");
+    const boost::regex match_expression(rp::param<std::string>("~match_expression", "(.+)\r?\n"));
+    const std::string format_expression(rp::param<std::string>("~format_expression", "$1"));
+    const std::string stop_command = rp::param<std::string>("~stop_command", "");
     const bool verbose = rp::param("~verbose", false);
 
     // create the publisher
-    ros::Publisher publisher = nh.advertise< std_msgs::String >("formatted", 1);
+    ros::Publisher publisher = nh.advertise<std_msgs::String>("formatted", 1);
 
     // open the serial port
     ba::io_service io_service;
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
       const std::size_t bytes = ba::read_until(serial_port, buffer, match_expression);
 
       // search matched sequence in the buffer
-      const char *const buffer_begin = ba::buffer_cast< const char * >(buffer.data());
+      const char *const buffer_begin = ba::buffer_cast<const char *>(buffer.data());
       const char *const buffer_end = buffer_begin + bytes;
       if (verbose) {
         ROS_INFO_STREAM("read: \"" << std::string(buffer_begin, bytes) << "\"");
