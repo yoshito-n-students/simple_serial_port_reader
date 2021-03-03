@@ -23,14 +23,14 @@ int main(int argc, char *argv[]) {
 
   try {
     // load parameters
-    const std::string device(rp::param< std::string >("~device", "/dev/ttyUSB0"));
-    const int baud_rate(rp::param("~baud_rate", 9600));
+    const std::string device = rp::param< std::string >("~device", "/dev/ttyUSB0");
+    const int baud_rate = rp::param("~baud_rate", 9600);
     const boost::regex match_expression(rp::param< std::string >("~match_expression", "(.+)\r?\n"));
     const std::string format_expression(rp::param< std::string >("~format_expression", "$1"));
-    const bool debug(rp::param("~debug", false));
+    const bool debug = rp::param("~debug", false);
 
     // create the publisher
-    ros::Publisher publisher(nh.advertise< std_msgs::String >("formatted", 1));
+    ros::Publisher publisher = nh.advertise< std_msgs::String >("formatted", 1);
 
     // open the serial port
     ba::io_service io_service;
@@ -42,11 +42,11 @@ int main(int argc, char *argv[]) {
     ba::streambuf buffer;
     while (ros::ok()) {
       // read until the buffer contains the match_expression
-      const std::size_t bytes(ba::read_until(serial_port, buffer, match_expression));
+      const std::size_t bytes = ba::read_until(serial_port, buffer, match_expression);
 
       // search matched sequence in the buffer
-      const char *buffer_begin(ba::buffer_cast< const char * >(buffer.data()));
-      const char *buffer_end(buffer_begin + bytes);
+      const char *const buffer_begin = ba::buffer_cast< const char * >(buffer.data());
+      const char *const buffer_end = buffer_begin + bytes;
       if (debug) {
         ROS_INFO_STREAM("read: \"" << std::string(buffer_begin, bytes) << "\"");
       }
