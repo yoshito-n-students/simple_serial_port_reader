@@ -5,6 +5,7 @@
 #include <boost/asio/read_until.hpp>
 #include <boost/asio/serial_port.hpp>
 #include <boost/asio/streambuf.hpp>
+#include <boost/asio/write.hpp>
 #include <boost/regex.hpp>
 
 #include <ros/init.h>
@@ -25,8 +26,10 @@ int main(int argc, char *argv[]) {
     // load parameters
     const std::string device = rp::param< std::string >("~device", "/dev/ttyUSB0");
     const int baud_rate = rp::param("~baud_rate", 9600);
+    const std::string start_command = rp::param< std::string >("~start_command", "");
     const boost::regex match_expression(rp::param< std::string >("~match_expression", "(.+)\r?\n"));
     const std::string format_expression(rp::param< std::string >("~format_expression", "$1"));
+    const std::string stop_command = rp::param< std::string >("~stop_command", "");
     const bool debug = rp::param("~debug", false);
 
     // create the publisher
@@ -37,6 +40,14 @@ int main(int argc, char *argv[]) {
     ba::serial_port serial_port(io_service);
     serial_port.open(device);
     serial_port.set_option(ba::serial_port::baud_rate(baud_rate));
+
+    // write the start command (if any)
+    if (!start_command.empty()) {
+      ba::write(serial_port, ba::buffer(start_command));
+      if (debug) {
+        ROS_INFO_STREAM("wrote as the start command: \"" << start_command << "\"");
+      }
+    }
 
     // reading loop
     ba::streambuf buffer;
@@ -68,6 +79,14 @@ int main(int argc, char *argv[]) {
 
       // consume the buffer processed in this loop
       buffer.consume(bytes);
+    }
+
+    // write the stop command (if any)
+    if (!stop_command.empty()) {
+      ba::write(serial_port, ba::buffer(stop_command));
+      if (debug) {
+        ROS_INFO_STREAM("wrote as the stop command: \"" << stop_command << "\"");
+      }
     }
   } catch (const std::exception &error) {
     ROS_ERROR_STREAM(error.what());
