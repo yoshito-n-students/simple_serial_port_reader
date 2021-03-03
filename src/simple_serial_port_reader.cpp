@@ -8,6 +8,7 @@
 #include <boost/asio/write.hpp>
 #include <boost/regex.hpp>
 
+#include <ros/console.h>
 #include <ros/init.h>
 #include <ros/node_handle.h>
 #include <ros/param.h>
