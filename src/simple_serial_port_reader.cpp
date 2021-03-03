@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
     const boost::regex match_expression(rp::param< std::string >("~match_expression", "(.+)\r?\n"));
     const std::string format_expression(rp::param< std::string >("~format_expression", "$1"));
     const std::string stop_command = rp::param< std::string >("~stop_command", "");
-    const bool debug = rp::param("~debug", false);
+    const bool verbose = rp::param("~verbose", false);
 
     // create the publisher
     ros::Publisher publisher = nh.advertise< std_msgs::String >("formatted", 1);
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
     // write the start command (if any)
     if (!start_command.empty()) {
       ba::write(serial_port, ba::buffer(start_command));
-      if (debug) {
+      if (verbose) {
         ROS_INFO_STREAM("wrote as the start command: \"" << start_command << "\"");
       }
     }
@@ -58,19 +58,19 @@ int main(int argc, char *argv[]) {
       // search matched sequence in the buffer
       const char *const buffer_begin = ba::buffer_cast< const char * >(buffer.data());
       const char *const buffer_end = buffer_begin + bytes;
-      if (debug) {
+      if (verbose) {
         ROS_INFO_STREAM("read: \"" << std::string(buffer_begin, bytes) << "\"");
       }
       boost::cmatch match;
       boost::regex_search(buffer_begin, buffer_end, match, match_expression);
-      if (debug) {
+      if (verbose) {
         ROS_INFO_STREAM("matched: \"" << match.str() << "\"");
       }
 
       // format the matched sequence
       std_msgs::String formatted;
       formatted.data = match.format(format_expression);
-      if (debug) {
+      if (verbose) {
         ROS_INFO_STREAM("formatted: \"" << formatted.data << "\"");
       }
 
@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
     // write the stop command (if any)
     if (!stop_command.empty()) {
       ba::write(serial_port, ba::buffer(stop_command));
-      if (debug) {
+      if (verbose) {
         ROS_INFO_STREAM("wrote as the stop command: \"" << stop_command << "\"");
       }
     }
