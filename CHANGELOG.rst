@@ -2,6 +2,12 @@
 Changelog for package simple_serial_port_reader
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.2 (2021-03-XX)
+------------------
+* C++11
+* Support start/stop commands
+* README
+
 0.0.1 (2021-03-03)
 ------------------
 * Initial version
