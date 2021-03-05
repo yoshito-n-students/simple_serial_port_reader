@@ -33,13 +33,10 @@ std::string replace_escape_sequence(std::string s){
     {"\\0", "\0"}
   };
   for(auto mp: replace_map){
-    std::string target = mp.first;
-    std::string replacement = mp.second;
-    //ROS_INFO_STREAM("map:" << mp.first << "," <<mp.second);
-    if (!target.empty()) {
+    if (!mp.first.empty()) {
       std::string::size_type pos = 0;
       while ((pos = s.find(mp.first, pos)) != std::string::npos) {
-	s.replace(pos, target.length(), mp.second);
+	s.replace(pos, mp.first.length(), mp.second);
 	pos += mp.second.length();
       }
     }
