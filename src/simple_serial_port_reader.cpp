@@ -17,6 +17,36 @@
 namespace ba = boost::asio;
 namespace rp = ros::param;
 
+std::string replace_escape_sequence(std::string s){
+  std::map <std::string, std::string> replace_map{
+    {"\\a", "\a"},
+    {"\\b", "\b"},
+    {"\\f", "\f"},
+    {"\\n", "\n"},
+    {"\\r", "\r"},
+    {"\\t", "\t"},
+    {"\\v", "\v"},
+    {"\\\\", "\\"},
+    {"\\\?", "\?"},
+    {"\\\'", "\'"},
+    {"\\\"", "\""},
+    {"\\0", "\0"}
+  };
+  for(auto mp: replace_map){
+    std::string target = mp.first;
+    std::string replacement = mp.second;
+    //ROS_INFO_STREAM("map:" << mp.first << "," <<mp.second);
+    if (!target.empty()) {
+      std::string::size_type pos = 0;
+      while ((pos = s.find(mp.first, pos)) != std::string::npos) {
+	s.replace(pos, target.length(), mp.second);
+	pos += mp.second.length();
+      }
+    }
+  }
+  return s;
+}
+
 int main(int argc, char *argv[]) {
   // init ROS
   ros::init(argc, argv, "simple_serial_port_reader");
@@ -43,7 +73,8 @@ int main(int argc, char *argv[]) {
 
     // write the start command (if any)
     if (!start_command.empty()) {
-      ba::write(serial_port, ba::buffer(start_command));
+      std::string cmd = replace_escape_sequence(start_command);
+      ba::write(serial_port, ba::buffer(cmd));
       if (verbose) {
         ROS_INFO_STREAM("wrote as the start command: \"" << start_command << "\"");
       }
@@ -83,7 +114,8 @@ int main(int argc, char *argv[]) {
 
     // write the stop command (if any)
     if (!stop_command.empty()) {
-      ba::write(serial_port, ba::buffer(stop_command));
+      std::string cmd = replace_escape_sequence(stop_command);
+      ba::write(serial_port, ba::buffer(cmd));
       if (verbose) {
         ROS_INFO_STREAM("wrote as the stop command: \"" << stop_command << "\"");
       }
