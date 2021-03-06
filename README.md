@@ -13,7 +13,7 @@ ___~baud_rate___ (int, default: 9600)
 ___~start_command___ (string, default: "")
 * command to write just after opening the serial port
 * write nothing if empty
-* do not forget to add newline charactors if required
+* c/c++ espace sequences are replaced to corresponding characters (ex. "\n" to newline, "\r" to carriage return)
 
 ___~match_expression___ (string, default: "(.+)\r?\n")
 * regular expression to match read texts
@@ -26,7 +26,7 @@ ___~format_expression___ (string, default: "$1")
 ___~stop_command___ (string, default: "")
 * command to write just before closing the serial port
 * write nothing if empty
-* do not forget to add newline charactors if required
+* c/c++ espace sequences are replaced to corresponding characters before writing
 
 ___~verbose___ (bool, default: false)
 * print texts wrote, read and formatted if true
