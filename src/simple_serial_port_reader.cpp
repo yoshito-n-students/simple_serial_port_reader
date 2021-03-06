@@ -1,5 +1,7 @@
+#include <map>
 #include <string>
 
+#include <boost/algorithm/string/replace.hpp>
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/read_until.hpp>
@@ -18,31 +20,15 @@
 namespace ba = boost::asio;
 namespace rp = ros::param;
 
-std::string replace_escape_sequence(std::string s){
-  std::map <std::string, std::string> replace_map{
-    {"\\a", "\a"},
-    {"\\b", "\b"},
-    {"\\f", "\f"},
-    {"\\n", "\n"},
-    {"\\r", "\r"},
-    {"\\t", "\t"},
-    {"\\v", "\v"},
-    {"\\\\", "\\"},
-    {"\\\?", "\?"},
-    {"\\\'", "\'"},
-    {"\\\"", "\""},
-    {"\\0", "\0"}
-  };
-  for(auto mp: replace_map){
-    if (!mp.first.empty()) {
-      std::string::size_type pos = 0;
-      while ((pos = s.find(mp.first, pos)) != std::string::npos) {
-	s.replace(pos, mp.first.length(), mp.second);
-	pos += mp.second.length();
-      }
-    }
+std::string replace_escape_sequence(std::string str) {
+  static const std::map<std::string, std::string> replace_map = {
+      {"R(\a)", "\a"}, {"R(\b)", "\b"}, {"R(\f)", "\f"}, {"R(\n)", "\n"},
+      {"R(\r)", "\r"}, {"R(\t)", "\t"}, {"R(\v)", "\v"}, {"R(\\)", "\\"},
+      {"R(\?)", "\?"}, {"R(\')", "\'"}, {"R(\")", "\""}, {"R(\0)", "\0"}};
+  for (const std::map<std::string, std::string>::value_type &entry : replace_map) {
+    boost::algorithm::replace_all(str, entry.first, entry.second);
   }
-  return s;
+  return str;
 }
 
 int main(int argc, char *argv[]) {
@@ -54,10 +40,12 @@ int main(int argc, char *argv[]) {
     // load parameters
     const std::string device = rp::param<std::string>("~device", "/dev/ttyUSB0");
     const int baud_rate = rp::param("~baud_rate", 9600);
-    const std::string start_command = rp::param<std::string>("~start_command", "");
+    const std::string start_command =
+        replace_escape_sequence(rp::param<std::string>("~start_command", ""));
     const boost::regex match_expression(rp::param<std::string>("~match_expression", "(.+)\r?\n"));
     const std::string format_expression(rp::param<std::string>("~format_expression", "$1"));
-    const std::string stop_command = rp::param<std::string>("~stop_command", "");
+    const std::string stop_command =
+        replace_escape_sequence(rp::param<std::string>("~stop_command", ""));
     const bool verbose = rp::param("~verbose", false);
 
     // create the publisher
@@ -71,8 +59,7 @@ int main(int argc, char *argv[]) {
 
     // write the start command (if any)
     if (!start_command.empty()) {
-      std::string cmd = replace_escape_sequence(start_command);
-      ba::write(serial_port, ba::buffer(cmd));
+      ba::write(serial_port, ba::buffer(start_command));
       if (verbose) {
         ROS_INFO_STREAM("wrote as the start command: \"" << start_command << "\"");
       }
@@ -112,8 +99,7 @@ int main(int argc, char *argv[]) {
 
     // write the stop command (if any)
     if (!stop_command.empty()) {
-      std::string cmd = replace_escape_sequence(stop_command);
-      ba::write(serial_port, ba::buffer(cmd));
+      ba::write(serial_port, ba::buffer(stop_command));
       if (verbose) {
         ROS_INFO_STREAM("wrote as the stop command: \"" << stop_command << "\"");
       }
