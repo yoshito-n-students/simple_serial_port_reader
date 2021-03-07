@@ -1,4 +1,3 @@
-#include <map>
 #include <string>
 
 #include <boost/algorithm/string/replace.hpp>
@@ -21,12 +20,12 @@ namespace ba = boost::asio;
 namespace rp = ros::param;
 
 std::string replace_escape_sequence(std::string str) {
-  static const std::map<std::string, std::string> replace_map = {
+  static const std::string replace_map[][2] = {
       {"R(\a)", "\a"}, {"R(\b)", "\b"}, {"R(\f)", "\f"}, {"R(\n)", "\n"},
       {"R(\r)", "\r"}, {"R(\t)", "\t"}, {"R(\v)", "\v"}, {"R(\\)", "\\"},
       {"R(\?)", "\?"}, {"R(\')", "\'"}, {"R(\")", "\""}, {"R(\0)", "\0"}};
-  for (const std::map<std::string, std::string>::value_type &entry : replace_map) {
-    boost::algorithm::replace_all(str, entry.first, entry.second);
+  for (const std::string (&entry)[2] : replace_map) {
+    boost::algorithm::replace_all(str, entry[0], entry[1]);
   }
   return str;
 }
