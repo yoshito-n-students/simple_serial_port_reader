@@ -8,7 +8,7 @@
         <param name="baud_rate" value="9600"/>
         <param name="match_expression" value="Z (\d+) z (\d+)\r\n"/>
         <param name="format_expression" value="CO2: Filtered = $1 ppm, Raw = $2 ppm"/>
-        <param name="debug" value="false"/>
+        <param name="verbose" value="false"/>
     </node>
     -->
 
@@ -19,7 +19,7 @@
         <param name="baud_rate" value="9600"/>
         <param name="match_expression" value="% (\d+.\d+) e \d+\r\n"/>
         <param name="format_expression" value="O2 = $1 %"/>
-        <param name="debug" value="true"/>
+        <param name="verbose" value="true"/>
     </node>
 
 </launch>
