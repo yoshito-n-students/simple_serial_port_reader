@@ -14,17 +14,19 @@
 #include <ros/node_handle.h>
 #include <ros/param.h>
 #include <ros/publisher.h>
-#include <std_msgs/String.h>
+#include <ros/time.h>
+#include <simple_serial_port_reader_msgs/StringStamped.h>
 
 namespace ba = boost::asio;
 namespace rp = ros::param;
+namespace sspr_msgs = simple_serial_port_reader_msgs;
 
 std::string replace_escape_sequence(std::string str) {
-  static const std::string replace_map[][2] = {
-      {"R(\a)", "\a"}, {"R(\b)", "\b"}, {"R(\f)", "\f"}, {"R(\n)", "\n"},
-      {"R(\r)", "\r"}, {"R(\t)", "\t"}, {"R(\v)", "\v"}, {"R(\\)", "\\"},
-      {"R(\?)", "\?"}, {"R(\')", "\'"}, {"R(\")", "\""}, {"R(\0)", "\0"}};
-  for (const std::string (&entry)[2] : replace_map) {
+  static const std::string replace_map[][2] = {{"R(\a)", "\a"}, {"R(\b)", "\b"}, {"R(\f)", "\f"},
+                                               {"R(\n)", "\n"}, {"R(\r)", "\r"}, {"R(\t)", "\t"},
+                                               {"R(\v)", "\v"}, {"R(\\)", "\\"}, {"R(\?)", "\?"},
+                                               {"R(\')", "\'"}, {"R(\")", "\""}, {"R(\0)", "\0"}};
+  for (const std::string(&entry)[2] : replace_map) {
     boost::algorithm::replace_all(str, entry[0], entry[1]);
   }
   return str;
@@ -48,7 +50,7 @@ int main(int argc, char *argv[]) {
     const bool verbose = rp::param("~verbose", false);
 
     // create the publisher
-    ros::Publisher publisher = nh.advertise<std_msgs::String>("formatted", 1);
+    ros::Publisher publisher = nh.advertise<sspr_msgs::StringStamped>("formatted", 1);
 
     // open the serial port
     ba::io_service io_service;
@@ -69,6 +71,7 @@ int main(int argc, char *argv[]) {
     while (ros::ok()) {
       // read until the buffer contains the match_expression
       const std::size_t bytes = ba::read_until(serial_port, buffer, match_expression);
+      const ros::Time stamp = ros::Time::now();
 
       // search matched sequence in the buffer
       const char *const buffer_begin = ba::buffer_cast<const char *>(buffer.data());
@@ -83,7 +86,8 @@ int main(int argc, char *argv[]) {
       }
 
       // format the matched sequence
-      std_msgs::String formatted;
+      sspr_msgs::StringStamped formatted;
+      formatted.header.stamp = stamp;
       formatted.data = match.format(format_expression);
       if (verbose) {
         ROS_INFO_STREAM("formatted: \"" << formatted.data << "\"");

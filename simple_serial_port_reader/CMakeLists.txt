@@ -10,7 +10,7 @@ add_definitions(-std=c++11)
 find_package(
   catkin REQUIRED COMPONENTS
   roscpp
-  std_msgs
+  simple_serial_port_reader_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -18,7 +18,7 @@ find_package(
   Boost REQUIRED COMPONENTS 
   regex
   system
-  )
+)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -109,7 +109,7 @@ find_package(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES simple_serial_port_reader
-  CATKIN_DEPENDS roscpp std_msgs
+  CATKIN_DEPENDS roscpp simple_serial_port_reader_msgs
 #  DEPENDS system_lib
 )
 
@@ -140,7 +140,7 @@ include_directories(
 add_executable(
   simple_serial_port_reader
   src/simple_serial_port_reader.cpp
-  )
+)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

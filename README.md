@@ -2,7 +2,7 @@
 Read, search, and format texts from a serial port
 
 ## <u>Published topics</u>
-___formatted___ (std_msgs/String)
+___formatted___ (simple_serial_port_reader_msgs/StringStamped)
 * formatted texts
 
 ## <u>Parameters</u>
