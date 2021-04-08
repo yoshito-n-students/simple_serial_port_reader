@@ -1,6 +1,7 @@
 #ifndef SIMPLE_SERIAL_PORT_READER_SIMPLE_SERIAL_PORT_READER_HPP
 #define SIMPLE_SERIAL_PORT_READER_SIMPLE_SERIAL_PORT_READER_HPP
 
+#include <stdexcept>
 #include <string>
 
 #include <nodelet/nodelet.h>
@@ -41,8 +42,16 @@ private:
     verbose_ = pnh.param("verbose", false);
 
     // open the serial port
-    serial_.open(device);
-    serial_.set_option(ba::serial_port::baud_rate(baud_rate));
+    try {
+      serial_.open(device);
+      serial_.set_option(ba::serial_port::baud_rate(baud_rate));
+    } catch (const std::exception &error) {
+      NODELET_FATAL_STREAM("error on opening \"" << device << "\": " << error.what());
+      return;
+    }
+    if (verbose_) {
+      NODELET_INFO_STREAM("opened \"" << device << "\"");
+    }
 
     // create the publisher
     pub_ = nh.advertise<sspr_msgs::StringStamped>("formatted", 1);
@@ -56,54 +65,58 @@ private:
     namespace ba = boost::asio;
     namespace sspr_msgs = simple_serial_port_reader_msgs;
 
-    // write the start command (if any)
-    if (!start_cmd_.empty()) {
-      ba::write(serial_, ba::buffer(start_cmd_));
-      if (verbose_) {
-        NODELET_INFO_STREAM("wrote as the start command: \"" << start_cmd_ << "\"");
-      }
-    }
-
-    // reading loop
-    ba::streambuf buffer;
-    while (ros::ok()) {
-      // read until the buffer contains the match_expression
-      const std::size_t bytes = ba::read_until(serial_, buffer, match_expr_);
-      const ros::Time stamp = ros::Time::now();
-
-      // search matched sequence in the buffer
-      const char *const buffer_begin = ba::buffer_cast<const char *>(buffer.data());
-      const char *const buffer_end = buffer_begin + bytes;
-      if (verbose_) {
-        NODELET_INFO_STREAM("read: \"" << std::string(buffer_begin, bytes) << "\"");
-      }
-      boost::cmatch match;
-      boost::regex_search(buffer_begin, buffer_end, match, match_expr_);
-      if (verbose_) {
-        NODELET_INFO_STREAM("matched: \"" << match.str() << "\"");
+    try {
+      // write the start command (if any)
+      if (!start_cmd_.empty()) {
+        ba::write(serial_, ba::buffer(start_cmd_));
+        if (verbose_) {
+          NODELET_INFO_STREAM("wrote as the start command: \"" << start_cmd_ << "\"");
+        }
       }
 
-      // format the matched sequence
-      sspr_msgs::StringStampedPtr formatted(new sspr_msgs::StringStamped());
-      formatted->header.stamp = stamp;
-      formatted->data = match.format(format_expr_);
-      if (verbose_) {
-        NODELET_INFO_STREAM("formatted: \"" << formatted->data << "\"");
+      // reading loop
+      ba::streambuf buffer;
+      while (ros::ok()) {
+        // read until the buffer contains the match_expression
+        const std::size_t bytes = ba::read_until(serial_, buffer, match_expr_);
+        const ros::Time stamp = ros::Time::now();
+
+        // search matched sequence in the buffer
+        const char *const buffer_begin = ba::buffer_cast<const char *>(buffer.data());
+        const char *const buffer_end = buffer_begin + bytes;
+        if (verbose_) {
+          NODELET_INFO_STREAM("read: \"" << std::string(buffer_begin, bytes) << "\"");
+        }
+        boost::cmatch match;
+        boost::regex_search(buffer_begin, buffer_end, match, match_expr_);
+        if (verbose_) {
+          NODELET_INFO_STREAM("matched: \"" << match.str() << "\"");
+        }
+
+        // format the matched sequence
+        sspr_msgs::StringStampedPtr formatted(new sspr_msgs::StringStamped());
+        formatted->header.stamp = stamp;
+        formatted->data = match.format(format_expr_);
+        if (verbose_) {
+          NODELET_INFO_STREAM("formatted: \"" << formatted->data << "\"");
+        }
+
+        // publish the formatted string
+        pub_.publish(formatted);
+
+        // consume the buffer processed in this loop
+        buffer.consume(bytes);
       }
 
-      // publish the formatted string
-      pub_.publish(formatted);
-
-      // consume the buffer processed in this loop
-      buffer.consume(bytes);
-    }
-
-    // write the stop command (if any)
-    if (!stop_cmd_.empty()) {
-      ba::write(serial_, ba::buffer(stop_cmd_));
-      if (verbose_) {
-        NODELET_INFO_STREAM("wrote as the stop command: \"" << stop_cmd_ << "\"");
+      // write the stop command (if any)
+      if (!stop_cmd_.empty()) {
+        ba::write(serial_, ba::buffer(stop_cmd_));
+        if (verbose_) {
+          NODELET_INFO_STREAM("wrote as the stop command: \"" << stop_cmd_ << "\"");
+        }
       }
+    } catch (const std::exception &error) {
+      NODELET_ERROR_STREAM(error.what());
     }
   }
 
