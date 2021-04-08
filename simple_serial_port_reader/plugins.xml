@@ -1,0 +1,10 @@
+<library path="lib/libsimple_serial_port_reader_plugin">
+
+    <class name="simple_serial_port_reader/SimpleSerialPortReader" 
+           type="simple_serial_port_reader::SimpleSerialPortReader" 
+           base_class_type="nodelet::Nodelet">
+        <description>
+        </description>
+    </class>
+
+</library>
