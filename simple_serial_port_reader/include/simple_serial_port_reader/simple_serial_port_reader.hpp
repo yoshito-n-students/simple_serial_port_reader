@@ -121,10 +121,10 @@ private:
   }
 
   static std::string replaceEscapeSequence(std::string str) {
-    static const std::string replace_map[][2] = {{"R(\a)", "\a"}, {"R(\b)", "\b"}, {"R(\f)", "\f"},
-                                                 {"R(\n)", "\n"}, {"R(\r)", "\r"}, {"R(\t)", "\t"},
-                                                 {"R(\v)", "\v"}, {"R(\\)", "\\"}, {"R(\?)", "\?"},
-                                                 {"R(\')", "\'"}, {"R(\")", "\""}, {"R(\0)", "\0"}};
+    static const std::string replace_map[][2] = {{R"(\a)", "\a"}, {R"(\b)", "\b"}, {R"(\f)", "\f"},
+                                                 {R"(\n)", "\n"}, {R"(\r)", "\r"}, {R"(\t)", "\t"},
+                                                 {R"(\v)", "\v"}, {R"(\\)", "\\"}, {R"(\?)", "\?"},
+                                                 {R"(\')", "\'"}, {R"(\")", "\""}, {R"(\0)", "\0"}};
     for (const std::string(&entry)[2] : replace_map) {
       boost::algorithm::replace_all(str, entry[0], entry[1]);
     }
