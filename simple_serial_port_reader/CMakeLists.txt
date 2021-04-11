@@ -9,8 +9,10 @@ add_definitions(-std=c++11)
 ## is used, also find other catkin packages
 find_package(
   catkin REQUIRED COMPONENTS
+  nodelet
+  pluginlib
   roscpp
-  std_msgs
+  simple_serial_port_reader_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -18,7 +20,7 @@ find_package(
   Boost REQUIRED COMPONENTS 
   regex
   system
-  )
+)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -109,7 +111,7 @@ find_package(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES simple_serial_port_reader
-  CATKIN_DEPENDS roscpp std_msgs
+  CATKIN_DEPENDS nodelet pluginlib roscpp simple_serial_port_reader_msgs
 #  DEPENDS system_lib
 )
 
@@ -121,13 +123,15 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/simple_serial_reader_.cpp
-# )
+add_library(
+  simple_serial_port_reader_plugin
+  src/simple_serial_port_reader_plugin.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -137,10 +141,10 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(
-  simple_serial_port_reader
-  src/simple_serial_port_reader.cpp
-  )
+# add_executable(
+#   simple_serial_port_reader
+#   src/simple_serial_port_reader.cpp
+# )
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -150,11 +154,15 @@ add_executable(
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(
+  simple_serial_port_reader_plugin
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS} # simple_serial_port_reader_msgs must be generated in advance 
+)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(
-  simple_serial_port_reader
+  simple_serial_port_reader_plugin
   ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
 )
