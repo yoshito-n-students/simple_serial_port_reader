@@ -2,7 +2,7 @@
 Changelog for package simple_serial_port_reader
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.0.3 (2021-04-XX)
+0.0.3 (2021-04-12)
 ------------------
 * Publish stamped string
 * Nodelet
